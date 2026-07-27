@@ -1,10 +1,10 @@
 package com.corebank.apispringbootcorebank.application.usecase;
 
-import java.math.BigDecimal;
+import com.corebank.apispringbootcorebank.application.output.GetBalanceOutput;
+
 import java.util.UUID;
 
 public interface GetBalanceUseCase {
 
-    BigDecimal execute(UUID accountId);
-
+    GetBalanceOutput execute(UUID accountId);
 }
