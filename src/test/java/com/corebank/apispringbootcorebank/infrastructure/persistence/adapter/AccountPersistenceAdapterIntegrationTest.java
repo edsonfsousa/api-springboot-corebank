@@ -68,24 +68,52 @@ class AccountPersistenceAdapterIntegrationTest {
 
     @Test
     void shouldSaveAndRestoreAccountBalance() {
-        Account account = Account.create();
+        UUID accountId = UUID.randomUUID();
 
-        account.credit(new BigDecimal("150.75"));
+        Account account = Account.restore(
+                accountId,
+                new BigDecimal("150.75")
+        );
 
         accountPersistenceAdapter.save(account);
 
         var result =
-                accountPersistenceAdapter.findById(account.getId());
+                accountPersistenceAdapter.findById(accountId);
 
         assertThat(result).isPresent();
 
         Account restoredAccount = result.orElseThrow();
 
         assertThat(restoredAccount.getId())
-                .isEqualTo(account.getId());
+                .isEqualTo(accountId);
 
         assertThat(restoredAccount.getBalance())
                 .isEqualByComparingTo("150.75");
+    }
+
+    @Test
+    void shouldFindAccountForUpdate() {
+        UUID accountId = UUID.randomUUID();
+
+        Account account = Account.restore(
+                accountId,
+                new BigDecimal("200.00")
+        );
+
+        accountPersistenceAdapter.save(account);
+
+        var result =
+                accountPersistenceAdapter.findByIdForUpdate(accountId);
+
+        assertThat(result).isPresent();
+
+        Account lockedAccount = result.orElseThrow();
+
+        assertThat(lockedAccount.getId())
+                .isEqualTo(accountId);
+
+        assertThat(lockedAccount.getBalance())
+                .isEqualByComparingTo("200.00");
     }
 
     @Test
@@ -94,6 +122,18 @@ class AccountPersistenceAdapterIntegrationTest {
 
         var result =
                 accountPersistenceAdapter.findById(nonexistentAccountId);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyWhenAccountForUpdateDoesNotExist() {
+        UUID nonexistentAccountId = UUID.randomUUID();
+
+        var result =
+                accountPersistenceAdapter.findByIdForUpdate(
+                        nonexistentAccountId
+                );
 
         assertThat(result).isEmpty();
     }

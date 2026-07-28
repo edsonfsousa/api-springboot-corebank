@@ -1,4 +1,4 @@
-package com.corebank.apispringbootcorebank.presentation.response;
+package com.corebank.apispringbootcorebank.presentation.dto.response;
 
 import java.time.Instant;
 

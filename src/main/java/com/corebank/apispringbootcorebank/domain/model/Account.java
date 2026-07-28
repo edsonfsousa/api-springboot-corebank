@@ -31,18 +31,15 @@ public class Account {
         );
     }
 
-    public static Account restore(UUID id, BigDecimal balance) {
+    public static Account restore(
+            UUID id,
+            BigDecimal balance
+    ) {
         return new Account(id, balance);
     }
 
-    public void credit(BigDecimal amount) {
-        BigDecimal validAmount = validateAmount(amount);
-
-        balance = balance.add(validAmount);
-    }
-
-    public void debit(BigDecimal amount) {
-        BigDecimal validAmount = validateAmount(amount);
+    public void applyTransaction(BigDecimal amount) {
+        BigDecimal validAmount = normalizeAmount(amount);
 
         if (balance.compareTo(validAmount) < 0) {
             throw new InsufficientBalanceException(
@@ -62,7 +59,7 @@ public class Account {
         return balance;
     }
 
-    private BigDecimal validateAmount(BigDecimal amount) {
+    private BigDecimal normalizeAmount(BigDecimal amount) {
         if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new InvalidAmountException();
         }

@@ -1,7 +1,8 @@
 package com.corebank.apispringbootcorebank.presentation.exception;
 
 import com.corebank.apispringbootcorebank.domain.exception.AccountNotFoundException;
-import com.corebank.apispringbootcorebank.presentation.response.ApiErrorResponse;
+import com.corebank.apispringbootcorebank.presentation.dto.response.ApiErrorResponse;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.time.Instant;
 
+@Hidden
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

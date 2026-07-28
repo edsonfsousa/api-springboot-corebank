@@ -10,4 +10,6 @@ public interface AccountGateway {
     Account save(Account account);
 
     Optional<Account> findById(UUID accountId);
+
+    Optional<Account> findByIdForUpdate(UUID accountId);
 }
