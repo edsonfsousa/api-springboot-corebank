@@ -14,11 +14,32 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class AccountTest {
 
     @Test
-    void shouldCreateAccountWithZeroBalance() {
+    void shouldCreateAccountWithInitialBalanceOfOneReal() {
         Account account = Account.create();
 
         assertNotNull(account.getId());
+        assertEquals(new BigDecimal("1.00"), account.getBalance());
+    }
+
+    @Test
+    void shouldAllowTransactionUsingInitialBalance() {
+        Account account = Account.create();
+
+        account.applyTransaction(new BigDecimal("1.00"));
+
         assertEquals(new BigDecimal("0.00"), account.getBalance());
+    }
+
+    @Test
+    void shouldRejectTransactionGreaterThanInitialBalance() {
+        Account account = Account.create();
+
+        assertThrows(
+                InsufficientBalanceException.class,
+                () -> account.applyTransaction(new BigDecimal("1.01"))
+        );
+
+        assertEquals(new BigDecimal("1.00"), account.getBalance());
     }
 
     @Test
@@ -67,9 +88,7 @@ class AccountTest {
 
         assertThrows(
                 InsufficientBalanceException.class,
-                () -> account.applyTransaction(
-                        new BigDecimal("100.01")
-                )
+                () -> account.applyTransaction(new BigDecimal("100.01"))
         );
 
         assertEquals(new BigDecimal("100.00"), account.getBalance());
@@ -97,9 +116,7 @@ class AccountTest {
 
         assertThrows(
                 InvalidAmountException.class,
-                () -> account.applyTransaction(
-                        new BigDecimal("-10.00")
-                )
+                () -> account.applyTransaction(new BigDecimal("-10.00"))
         );
     }
 

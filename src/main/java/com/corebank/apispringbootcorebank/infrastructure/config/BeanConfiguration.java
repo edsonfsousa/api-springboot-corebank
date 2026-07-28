@@ -11,8 +11,11 @@ import com.corebank.apispringbootcorebank.domain.gateway.AccountGateway;
 import com.corebank.apispringbootcorebank.domain.gateway.TransactionGateway;
 import com.corebank.apispringbootcorebank.infrastructure.persistence.adapter.TransactionPersistenceAdapter;
 import com.corebank.apispringbootcorebank.infrastructure.persistence.repository.TransactionJpaRepository;
+import com.corebank.apispringbootcorebank.infrastructure.transaction.CreateTransactionTransactionalDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Configuration
 public class BeanConfiguration {
@@ -45,13 +48,27 @@ public class BeanConfiguration {
     }
 
     @Bean
+    public TransactionTemplate transactionTemplate(
+            PlatformTransactionManager transactionManager
+    ) {
+        return new TransactionTemplate(transactionManager);
+    }
+
+    @Bean
     public CreateTransactionUseCase createTransactionUseCase(
             AccountGateway accountGateway,
-            TransactionGateway transactionGateway
+            TransactionGateway transactionGateway,
+            TransactionTemplate transactionTemplate
     ) {
-        return new CreateTransactionService(
-                accountGateway,
-                transactionGateway
+        CreateTransactionUseCase service =
+                new CreateTransactionService(
+                        accountGateway,
+                        transactionGateway
+                );
+
+        return new CreateTransactionTransactionalDecorator(
+                service,
+                transactionTemplate
         );
     }
 }

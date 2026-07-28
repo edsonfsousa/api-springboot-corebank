@@ -63,7 +63,7 @@ class AccountPersistenceAdapterIntegrationTest {
                 .isEqualTo(account.getId());
 
         assertThat(restoredAccount.getBalance())
-                .isEqualByComparingTo("0.00");
+                .isEqualByComparingTo("1.00");
     }
 
     @Test

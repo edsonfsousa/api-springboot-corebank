@@ -9,6 +9,8 @@ import com.corebank.apispringbootcorebank.domain.gateway.TransactionGateway;
 import com.corebank.apispringbootcorebank.domain.model.Account;
 import com.corebank.apispringbootcorebank.domain.model.Transaction;
 
+import java.util.Objects;
+
 public class CreateTransactionService
         implements CreateTransactionUseCase {
 
@@ -19,14 +21,19 @@ public class CreateTransactionService
             AccountGateway accountGateway,
             TransactionGateway transactionGateway
     ) {
-        this.accountGateway = accountGateway;
-        this.transactionGateway = transactionGateway;
+        this.accountGateway = Objects.requireNonNull(accountGateway);
+        this.transactionGateway = Objects.requireNonNull(transactionGateway);
     }
 
     @Override
     public CreateTransactionOutput execute(
             CreateTransactionInput input
     ) {
+        Objects.requireNonNull(
+                input,
+                "Create transaction input must not be null"
+        );
+
         Account account = accountGateway
                 .findByIdForUpdate(input.accountId())
                 .orElseThrow(() ->
@@ -36,12 +43,13 @@ public class CreateTransactionService
         account.applyTransaction(input.amount());
 
         Transaction transaction = Transaction.create(
-                input.accountId(),
+                account.getId(),
                 input.amount(),
                 input.description()
         );
 
-        accountGateway.save(account);
+        Account savedAccount = accountGateway.save(account);
+
         Transaction savedTransaction =
                 transactionGateway.save(transaction);
 
@@ -49,7 +57,7 @@ public class CreateTransactionService
                 savedTransaction.getId(),
                 savedTransaction.getAccountId(),
                 savedTransaction.getAmount(),
-                account.getBalance(),
+                savedAccount.getBalance(),
                 savedTransaction.getDescription(),
                 savedTransaction.getCreatedAt()
         );
