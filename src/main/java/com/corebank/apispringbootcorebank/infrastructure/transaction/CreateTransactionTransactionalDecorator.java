@@ -7,21 +7,27 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.Objects;
 
-public class TransactionalCreateTransactionUseCase implements CreateTransactionUseCase {
+public class CreateTransactionTransactionalDecorator
+        implements CreateTransactionUseCase {
 
     private final CreateTransactionUseCase delegate;
     private final TransactionTemplate transactionTemplate;
 
-    public TransactionalCreateTransactionUseCase(
+    public CreateTransactionTransactionalDecorator(
             CreateTransactionUseCase delegate,
             TransactionTemplate transactionTemplate
     ) {
         this.delegate = Objects.requireNonNull(delegate);
-        this.transactionTemplate = Objects.requireNonNull(transactionTemplate);
+        this.transactionTemplate =
+                Objects.requireNonNull(transactionTemplate);
     }
 
     @Override
-    public CreateTransactionOutput execute(CreateTransactionInput input) {
-        return transactionTemplate.execute(status -> delegate.execute(input));
+    public CreateTransactionOutput execute(
+            CreateTransactionInput input
+    ) {
+        return transactionTemplate.execute(
+                status -> delegate.execute(input)
+        );
     }
 }
