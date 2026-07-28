@@ -39,7 +39,7 @@ The proposed solution for the challenge is shown below.
 
 > *Solution image*
 
-![Architecture](docs/images/corebank-architecture.jpg)
+![Architecture](docs/images/corebank-architecture.png)
 
 ---
 
