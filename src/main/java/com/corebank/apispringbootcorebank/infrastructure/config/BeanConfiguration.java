@@ -6,6 +6,7 @@ import com.corebank.apispringbootcorebank.application.usecase.GetBalanceUseCase;
 import com.corebank.apispringbootcorebank.application.usecase.implementation.CreateAccountService;
 import com.corebank.apispringbootcorebank.application.usecase.implementation.CreateTransactionService;
 import com.corebank.apispringbootcorebank.application.usecase.implementation.GetBalanceService;
+import com.corebank.apispringbootcorebank.domain.gateway.AccountBalanceCacheGateway;
 import com.corebank.apispringbootcorebank.domain.gateway.AccountGateway;
 import com.corebank.apispringbootcorebank.domain.gateway.TransactionGateway;
 import com.corebank.apispringbootcorebank.infrastructure.persistence.adapter.TransactionPersistenceAdapter;
@@ -25,16 +26,22 @@ public class BeanConfiguration {
 
     @Bean
     public GetBalanceUseCase getBalanceUseCase(
-            AccountGateway accountGateway
+            AccountGateway accountGateway,
+            AccountBalanceCacheGateway accountBalanceCacheGateway
     ) {
-        return new GetBalanceService(accountGateway);
+        return new GetBalanceService(
+                accountGateway,
+                accountBalanceCacheGateway
+        );
     }
 
     @Bean
     public TransactionGateway transactionGateway(
             TransactionJpaRepository transactionJpaRepository
     ) {
-        return new TransactionPersistenceAdapter(transactionJpaRepository);
+        return new TransactionPersistenceAdapter(
+                transactionJpaRepository
+        );
     }
 
     @Bean
@@ -47,5 +54,4 @@ public class BeanConfiguration {
                 transactionGateway
         );
     }
-
 }
