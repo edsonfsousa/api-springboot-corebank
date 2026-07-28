@@ -4,8 +4,8 @@ import com.corebank.apispringbootcorebank.application.output.CreateAccountOutput
 import com.corebank.apispringbootcorebank.application.output.GetBalanceOutput;
 import com.corebank.apispringbootcorebank.application.usecase.CreateAccountUseCase;
 import com.corebank.apispringbootcorebank.application.usecase.GetBalanceUseCase;
-import com.corebank.apispringbootcorebank.presentation.response.CreateAccountResponse;
-import com.corebank.apispringbootcorebank.presentation.response.GetBalanceResponse;
+import com.corebank.apispringbootcorebank.presentation.dto.response.CreateAccountResponse;
+import com.corebank.apispringbootcorebank.presentation.dto.response.GetBalanceResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

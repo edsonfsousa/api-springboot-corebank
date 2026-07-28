@@ -38,4 +38,10 @@ public class AccountPersistenceAdapter implements AccountGateway {
         return repository.findById(accountId)
                 .map(mapper::toDomain);
     }
+
+    @Override
+    public Optional<Account> findByIdForUpdate(UUID accountId) {
+        return repository.findByIdForUpdate(accountId)
+                .map(mapper::toDomain);
+    }
 }
