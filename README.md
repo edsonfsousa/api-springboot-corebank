@@ -86,19 +86,16 @@ src/main/java/com/corebank/apispringbootcorebank
 # Roadmap
 
 - [x] Spring Boot Project
-- [ ] PostgreSQL Integration
-- [ ] Redis Integration
-- [ ] Balance Endpoint
-- [ ] Cache-Aside Implementation
-- [ ] Cache Invalidation
-- [ ] Card Transactions
-- [ ] PIX Transactions
-- [ ] Unit Tests
-- [ ] Integration Tests
-- [ ] Docker Compose
-- [ ] Observability
-- [ ] GitHub Actions
-
+- [x] PostgreSQL Integration
+- [x] Redis Integration
+- [x] Balance Endpoint
+- [x] Cache-Aside Implementation
+- [x] Cache Invalidation
+- [x] Card Transactions
+- [x] PIX Transactions
+- [x] Unit Tests
+- [x] Integration Tests
+- [x] Docker Compose
 ---
 
 # Author
