@@ -5,19 +5,20 @@ import com.corebank.apispringbootcorebank.domain.model.Transaction;
 import com.corebank.apispringbootcorebank.infrastructure.persistence.entity.TransactionEntity;
 import com.corebank.apispringbootcorebank.infrastructure.persistence.repository.TransactionJpaRepository;
 
-public class TransactionPersistenceAdapter
-        implements TransactionGateway {
+import java.util.Objects;
+
+public class TransactionPersistenceAdapter implements TransactionGateway {
 
     private final TransactionJpaRepository repository;
 
-    public TransactionPersistenceAdapter(
-            TransactionJpaRepository repository
-    ) {
-        this.repository = repository;
+    public TransactionPersistenceAdapter(TransactionJpaRepository repository) {
+        this.repository = Objects.requireNonNull(repository);
     }
 
     @Override
     public Transaction save(Transaction transaction) {
+        Objects.requireNonNull(transaction, "Transaction must not be null");
+
         TransactionEntity entity = new TransactionEntity(
                 transaction.getId(),
                 transaction.getAccountId(),

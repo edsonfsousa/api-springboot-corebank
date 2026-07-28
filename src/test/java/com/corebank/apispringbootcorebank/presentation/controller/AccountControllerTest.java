@@ -42,7 +42,7 @@ class AccountControllerTest {
 
         CreateAccountOutput output = new CreateAccountOutput(
                 accountId,
-                new BigDecimal("0.00")
+                new BigDecimal("1.00")
         );
 
         when(createAccountUseCase.execute())
@@ -51,7 +51,7 @@ class AccountControllerTest {
         mockMvc.perform(post("/api/v1/accounts"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.accountId").value(accountId.toString()))
-                .andExpect(jsonPath("$.balance").value(0.00));
+                .andExpect(jsonPath("$.balance").value(1.00));
 
         verify(createAccountUseCase).execute();
     }
