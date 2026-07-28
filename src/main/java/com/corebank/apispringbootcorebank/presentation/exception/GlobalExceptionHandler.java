@@ -1,9 +1,12 @@
 package com.corebank.apispringbootcorebank.presentation.exception;
 
 import com.corebank.apispringbootcorebank.domain.exception.AccountNotFoundException;
+import com.corebank.apispringbootcorebank.domain.exception.InsufficientBalanceException;
 import com.corebank.apispringbootcorebank.presentation.dto.response.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +20,9 @@ import java.time.Instant;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log =
+            LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleAccountNotFound(
             AccountNotFoundException exception,
@@ -24,6 +30,18 @@ public class GlobalExceptionHandler {
     ) {
         return buildResponse(
                 HttpStatus.NOT_FOUND,
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+    }
+
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<ApiErrorResponse> handleInsufficientBalance(
+            InsufficientBalanceException exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.UNPROCESSABLE_ENTITY,
                 exception.getMessage(),
                 request.getRequestURI()
         );
@@ -50,7 +68,9 @@ public class GlobalExceptionHandler {
                 .getFieldErrors()
                 .stream()
                 .findFirst()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .map(error ->
+                        error.getField() + ": " + error.getDefaultMessage()
+                )
                 .orElse("Invalid request");
 
         return buildResponse(
@@ -65,6 +85,13 @@ public class GlobalExceptionHandler {
             Exception exception,
             HttpServletRequest request
     ) {
+        log.error(
+                "Unexpected error while processing request: method={}, path={}",
+                request.getMethod(),
+                request.getRequestURI(),
+                exception
+        );
+
         return buildResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred",

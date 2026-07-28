@@ -27,7 +27,7 @@ public class Account {
     public static Account create() {
         return new Account(
                 UUID.randomUUID(),
-                BigDecimal.ZERO
+                new BigDecimal("1.00")
         );
     }
 

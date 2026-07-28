@@ -48,17 +48,6 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public CreateTransactionUseCase createTransactionUseCase(
-            AccountGateway accountGateway,
-            TransactionGateway transactionGateway
-    ) {
-        return new CreateTransactionService(
-                accountGateway,
-                transactionGateway
-        );
-    }
-
-    @Bean
     public TransactionTemplate transactionTemplate(
             PlatformTransactionManager transactionManager
     ) {
