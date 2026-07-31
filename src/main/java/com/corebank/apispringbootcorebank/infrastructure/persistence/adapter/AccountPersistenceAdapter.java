@@ -2,6 +2,7 @@ package com.corebank.apispringbootcorebank.infrastructure.persistence.adapter;
 
 import com.corebank.apispringbootcorebank.domain.gateway.AccountGateway;
 import com.corebank.apispringbootcorebank.domain.model.Account;
+import com.corebank.apispringbootcorebank.infrastructure.observability.BalanceMetrics;
 import com.corebank.apispringbootcorebank.infrastructure.persistence.entity.AccountJpaEntity;
 import com.corebank.apispringbootcorebank.infrastructure.persistence.mapper.AccountPersistenceMapper;
 import com.corebank.apispringbootcorebank.infrastructure.persistence.repository.SpringDataAccountRepository;
@@ -15,13 +16,16 @@ public class AccountPersistenceAdapter implements AccountGateway {
 
     private final SpringDataAccountRepository repository;
     private final AccountPersistenceMapper mapper;
+    private final BalanceMetrics balanceMetrics;
 
     public AccountPersistenceAdapter(
             SpringDataAccountRepository repository,
-            AccountPersistenceMapper mapper
+            AccountPersistenceMapper mapper,
+            BalanceMetrics balanceMetrics
     ) {
         this.repository = repository;
         this.mapper = mapper;
+        this.balanceMetrics = balanceMetrics;
     }
 
     @Override
@@ -35,8 +39,13 @@ public class AccountPersistenceAdapter implements AccountGateway {
 
     @Override
     public Optional<Account> findById(UUID accountId) {
-        return repository.findById(accountId)
-                .map(mapper::toDomain);
+        balanceMetrics.recordDatabaseQuery();
+
+        return balanceMetrics.measureDatabase(
+                () -> repository
+                        .findById(accountId)
+                        .map(mapper::toDomain)
+        );
     }
 
     @Override
