@@ -1,6 +1,7 @@
 package com.corebank.apispringbootcorebank.infrastructure.cache;
 
 import com.corebank.apispringbootcorebank.domain.gateway.AccountBalanceCacheGateway;
+import com.corebank.apispringbootcorebank.infrastructure.observability.BalanceMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,14 +28,17 @@ public class RedisAccountBalanceCacheAdapter
 
     private final StringRedisTemplate redisTemplate;
     private final Duration accountBalanceTtl;
+    private final BalanceMetrics balanceMetrics;
 
     public RedisAccountBalanceCacheAdapter(
             StringRedisTemplate redisTemplate,
             @Value("${application.cache.account-balance-ttl:5s}")
-            Duration accountBalanceTtl
+            Duration accountBalanceTtl,
+            BalanceMetrics balanceMetrics
     ) {
         this.redisTemplate = redisTemplate;
         this.accountBalanceTtl = accountBalanceTtl;
+        this.balanceMetrics = balanceMetrics;
     }
 
     @Override
@@ -42,11 +46,15 @@ public class RedisAccountBalanceCacheAdapter
         String key = buildKey(accountId);
 
         try {
-            String cachedBalance = redisTemplate
-                    .opsForValue()
-                    .get(key);
+            String cachedBalance = balanceMetrics.measureRedis(
+                    () -> redisTemplate
+                            .opsForValue()
+                            .get(key)
+            );
 
             if (cachedBalance == null || cachedBalance.isBlank()) {
+                balanceMetrics.recordCacheMiss();
+
                 LOGGER.debug(
                         "Account balance cache miss. accountId={}",
                         accountId
@@ -57,6 +65,8 @@ public class RedisAccountBalanceCacheAdapter
 
             BigDecimal balance = new BigDecimal(cachedBalance);
 
+            balanceMetrics.recordCacheHit();
+
             LOGGER.debug(
                     "Account balance cache hit. accountId={}",
                     accountId
@@ -64,6 +74,8 @@ public class RedisAccountBalanceCacheAdapter
 
             return Optional.of(balance);
         } catch (NumberFormatException exception) {
+            balanceMetrics.recordInvalidCacheValue();
+
             LOGGER.warn(
                     "Invalid account balance stored in Redis. " +
                             "The cache entry will be removed. accountId={}",
@@ -75,6 +87,8 @@ public class RedisAccountBalanceCacheAdapter
 
             return Optional.empty();
         } catch (DataAccessException exception) {
+            balanceMetrics.recordCacheError();
+
             LOGGER.warn(
                     "Unable to read account balance from Redis. " +
                             "The application will fall back to PostgreSQL. accountId={}",

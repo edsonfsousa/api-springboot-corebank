@@ -9,9 +9,11 @@ import com.corebank.apispringbootcorebank.application.usecase.implementation.Get
 import com.corebank.apispringbootcorebank.domain.gateway.AccountBalanceCacheGateway;
 import com.corebank.apispringbootcorebank.domain.gateway.AccountGateway;
 import com.corebank.apispringbootcorebank.domain.gateway.TransactionGateway;
+import com.corebank.apispringbootcorebank.infrastructure.observability.BalanceMetrics;
 import com.corebank.apispringbootcorebank.infrastructure.persistence.adapter.TransactionPersistenceAdapter;
 import com.corebank.apispringbootcorebank.infrastructure.persistence.repository.TransactionJpaRepository;
 import com.corebank.apispringbootcorebank.infrastructure.transaction.CreateTransactionTransactionalDecorator;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -19,6 +21,13 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 @Configuration
 public class BeanConfiguration {
+
+    @Bean
+    public BalanceMetrics balanceMetrics(
+            MeterRegistry meterRegistry
+    ) {
+        return new BalanceMetrics(meterRegistry);
+    }
 
     @Bean
     public CreateAccountUseCase createAccountUseCase(
